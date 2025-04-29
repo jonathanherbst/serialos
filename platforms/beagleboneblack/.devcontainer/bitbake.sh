@@ -35,7 +35,6 @@ ${DOCKER} run --rm -it \
     "${image_name}" -c " \
         set -x && \
         cd ${docker_project_dir} && \
-        ls -lh && \
         . poky/oe-init-build-env && \
         bitbake $BITBAKE_ARGS \
     "
