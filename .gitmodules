@@ -1,0 +1,9 @@
+[submodule "platforms/beagleboneblack/poky"]
+	path = platforms/beagleboneblack/poky
+	url = https://git.yoctoproject.org/poky/
+[submodule "platforms/beagleboneblack/meta-ti"]
+	path = platforms/beagleboneblack/meta-ti
+	url = https://git.yoctoproject.org/meta-ti/
+[submodule "platforms/beagleboneblack/meta-arm"]
+	path = platforms/beagleboneblack/meta-arm
+	url = https://git.yoctoproject.org/meta-arm
