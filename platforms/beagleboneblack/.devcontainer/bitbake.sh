@@ -21,7 +21,8 @@ ${DOCKER} run --rm -it \
     --userns=keep-id \
     -v "${project_dir}:${docker_project_dir}" \
     -w "${docker_project_dir}" \
-    -e MACHINE="beaglebone" \
+    -e MACHINE="beagle-megaserial" \
+    -e DISTRO="megaserial" \
     -e BBLAYERS=" \
         ${docker_project_dir}/poky/meta \
         ${docker_project_dir}/poky/meta-poky \
@@ -30,6 +31,7 @@ ${DOCKER} run --rm -it \
         ${docker_project_dir}/meta-ti/meta-ti-bsp \
         ${docker_project_dir}/meta-arm/meta-arm \
         ${docker_project_dir}/meta-arm/meta-arm-toolchain \
+        ${docker_project_dir}/meta-megaserial \
     " \
     -e BB_ENV_PASSTHROUGH_ADDITIONS="BBLAYERS" \
     "${image_name}" -c " \

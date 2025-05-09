@@ -1,1 +1,8 @@
+# yocto
 platforms/beagleboneblack/build
+
+# vscode
+.vscode
+
+# vim
+Session.vim
