@@ -1,5 +1,8 @@
 UBOOT_EXTLINUX_FDTOVERLAYS ??= ""
 
+# I coppied this from the latest yocto uboot-extlinux-config.bbclass
+# from yocto walnascar to get FDTOVERLAYS, hopefully the next lts will
+# have FDTOVERLAYS and we can remove this file altogether
 python do_create_extlinux_config() {
     if d.getVar("UBOOT_EXTLINUX") != "1":
       return
