@@ -1,0 +1,7 @@
+[package]
+name = "software"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+libbtrfs = "0.0.12"

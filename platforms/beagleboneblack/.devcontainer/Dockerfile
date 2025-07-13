@@ -1,8 +1,9 @@
 FROM debian:12
 
 # install packages required for yocto
-RUN apt update
+RUN apt-get update
 RUN apt-get install -y \
+    bash-completion \
     build-essential \
     chrpath \
     cpio \
@@ -12,6 +13,7 @@ RUN apt-get install -y \
     gawk \
     gcc \
     git \
+    iproute2 \
     iputils-ping \
     libacl1 \
     liblz4-tool \
@@ -23,7 +25,9 @@ RUN apt-get install -y \
     python3-pip \
     python3-subunit \
     socat \
+    sudo \
     texinfo \
+    tmux \
     unzip \
     wget \
     xz-utils \
@@ -36,4 +40,6 @@ RUN locale-gen
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 RUN groupadd -g ${USER_ID} megaserial && \
-    useradd -N -m -u ${USER_ID} -g ${GROUP_ID} -s "/bin/bash" megaserial
+    useradd -N -m -u ${USER_ID} -g ${GROUP_ID} -s "/bin/bash" megaserial && \
+    adduser megaserial sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
