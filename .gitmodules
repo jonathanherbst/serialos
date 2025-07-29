@@ -1,12 +1,12 @@
-[submodule "platforms/beagleboneblack/poky"]
-	path = platforms/beagleboneblack/poky
+[submodule "yocto/poky"]
+	path = yocto/poky
 	url = https://git.yoctoproject.org/poky/
-[submodule "platforms/beagleboneblack/meta-ti"]
-	path = platforms/beagleboneblack/meta-ti
+[submodule "yocto/meta-ti"]
+	path = yocto/meta-ti
 	url = https://git.yoctoproject.org/meta-ti/
-[submodule "platforms/beagleboneblack/meta-arm"]
-	path = platforms/beagleboneblack/meta-arm
+[submodule "yocto/meta-arm"]
+	path = yocto/meta-arm
 	url = https://git.yoctoproject.org/meta-arm
-[submodule "platforms/beagleboneblack/meta-raspberrypi"]
-	path = platforms/beagleboneblack/meta-raspberrypi
+[submodule "yocto/meta-raspberrypi"]
+	path = yocto/meta-raspberrypi
 	url = https://github.com/agherzan/meta-raspberrypi.git

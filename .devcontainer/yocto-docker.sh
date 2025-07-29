@@ -36,8 +36,6 @@ DOCKER_EXTRA="--userns=keep-id"
 ${DOCKER} run --rm -it \
     --entrypoint="/bin/bash" \
     --user="megaserial" \
-    --cap-add=NET_ADMIN \
-    --device=/dev/net/tun:/dev/net/tun \
     $DOCKER_EXTRA \
     -v "${project_dir}:${docker_project_dir}" \
     -w "${docker_project_dir}" \
@@ -46,20 +44,20 @@ ${DOCKER} run --rm -it \
     -e ENABLE_UART=1 \
     -e TERM="xterm-256color" \
     -e BBLAYERS=" \
-        ${docker_project_dir}/poky/meta \
-        ${docker_project_dir}/poky/meta-poky \
-        ${docker_project_dir}/poky/meta-yocto-bsp \
-        ${docker_project_dir}/meta-ti/meta-beagle \
-        ${docker_project_dir}/meta-ti/meta-ti-bsp \
-        ${docker_project_dir}/meta-raspberrypi \
-        ${docker_project_dir}/meta-arm/meta-arm \
-        ${docker_project_dir}/meta-arm/meta-arm-toolchain \
-        ${docker_project_dir}/meta-megaserial \
+        ${docker_project_dir}/yocto/poky/meta \
+        ${docker_project_dir}/yocto/poky/meta-poky \
+        ${docker_project_dir}/yocto/poky/meta-yocto-bsp \
+        ${docker_project_dir}/yocto/meta-ti/meta-beagle \
+        ${docker_project_dir}/yocto/meta-ti/meta-ti-bsp \
+        ${docker_project_dir}/yocto/meta-raspberrypi \
+        ${docker_project_dir}/yocto/meta-arm/meta-arm \
+        ${docker_project_dir}/yocto/meta-arm/meta-arm-toolchain \
+        ${docker_project_dir}/yocto/meta-megaserial \
     " \
     -e BB_ENV_PASSTHROUGH_ADDITIONS="BBLAYERS ENABLE_UART" \
     "${image_name}" -c " \
         set -x && \
-        cd ${docker_project_dir} && \
+        cd ${docker_project_dir}/yocto && \
         . poky/oe-init-build-env && \
         $COMMAND \
     "

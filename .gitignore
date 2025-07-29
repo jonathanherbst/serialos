@@ -1,5 +1,5 @@
 # yocto
-platforms/beagleboneblack/build
+yocto/build
 
 # vscode
 .vscode
