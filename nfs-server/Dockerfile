@@ -1,9 +1,7 @@
-FROM debian:12
+FROM rust:1.88-bookworm
 
 RUN apt-get update
 RUN apt-get install -y \
-    nfs-ganesha \
-    nfs-ganesha-vfs \
     sudo
 
 ARG USER_ID=1000
@@ -13,8 +11,5 @@ RUN groupadd -g ${USER_ID} serialos && \
     adduser serialos sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-RUN mkdir /var/run/ganesha
-RUN mkdir /run/sendsigs.omit.d/
-RUN mkdir /nfs/
+RUN cargo install cargo-nfs3-server
 
-COPY ganesha.conf /etc/ganesha/ganesha.conf
