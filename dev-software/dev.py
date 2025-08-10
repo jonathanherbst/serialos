@@ -1,9 +1,11 @@
 import podman
+from podman.domain.images import Image as PodmanImage
 from podman.errors import exceptions
 
 import argparse
 import logging
 import pathlib
+import re
 import subprocess
 import sys
 
@@ -91,23 +93,84 @@ def yocto_shell(machine: str, command: str):
 
     subprocess.run(shell_cmd, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
 
-def nfs_server(archive_path: pathlib.Path):
-    archive_path = archive_path.resolve()
-    image = get_nfs_image()
-    extension = ''.join(archive_path.suffixes)
-    shell_cmd = '''podman run --rm -it \\
-            --entrypoint="/bin/bash" \\
-            --user="nfs" \\
-            -v "{archive_path}:/archive{extension}" \\
-            -p 11111:11111/tcp \\
-            {image_id} -c " \\
-                set -x && \\
-                sudo tar -xf /archive{extension} -C /mnt && \\
-                sudo /usr/local/cargo/bin/cargo-nfs3-server --path /mnt/ \\
-            " \\
-    '''.format(archive_path=archive_path, extension=extension, image_id=image.id)
+def run_qemu():
+    yocto_shell("qemu", "bitbake serialos-bare-image")
+    yocto_shell("qemu", " \
+        qemu-img create -f qcow2 /home/yocto/data-img.qcow2 1G && \
+        runqemu serialos-bare-image slirp nographic qemuparams=\"-drive file=/home/yocto/data-img.qcow2,format=qcow2,if=virtio\" \
+    ")
 
-    subprocess.run(shell_cmd, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+class PodmanRun:
+    def __init__(self, image: PodmanImage, user: str, command: str):
+        self.image = image
+        self.user = user
+        self.command = command
+        self.volumes: list[tuple[str, str]] = []
+        self.ports: list[tuple[int, int]] = []
+        self.environment: list[tuple[str, str]] = []
+
+    def build_command(self):
+        vol_args = " ".join(['-v "%s:%s"' % (host, guest) for (host, guest) in self.volumes])
+        port_args = " ".join(['-p "%d:%d"' % (host, guest) for (host, guest) in self.ports])
+        env_args = " ".join(['-e "%s=%s"' % (name, value) for (name, value) in self.environment])
+        return '''podman run --rm -it \\
+            --entrypoint="/bin/bash" \\
+            --user="{user}" \\
+            --userns=keep-id \\
+            {volumes} \\
+            {ports} \\
+            {environment} \\
+            {image_id} -c "{command}" \\
+        '''.format(user=self.user, volumes=vol_args, ports=port_args, environment=env_args, image_id=self.image.id, command=self.command)
+
+    def run_shell_bound(self):
+        shell_cmd = self.build_command()
+        return subprocess.run(shell_cmd, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+
+    def popen(self, **kwargs):
+        shell_cmd = self.build_command()
+        return subprocess.Popen(shell_cmd, shell=True, **kwargs)
+
+class NFSServer:
+    class Monitor:
+        def __init__(self, process: subprocess.Popen):
+            self.process = process
+            self.ready = False
+
+        def wait_ready(self):
+            if not self.ready and self.process.stdout is not None:
+                for line in self.process.stdout:
+                    if "INFO nfs3_server::tcp: Listening on" in line:
+                        self.ready = True
+                        return
+
+        def kill(self):
+            self.process.kill()
+            self.process.communicate()
+            return self.process.returncode
+
+    def __init__(self, archive_path: pathlib.Path):
+        image = get_nfs_image()
+        archive_path = archive_path.resolve()
+        archive_guest = "/archive%s" % ''.join(archive_path.suffixes)
+        command = '''set -x && \\
+            sudo tar -xf %s -C /mnt && \\
+            sudo /usr/local/cargo/bin/cargo-nfs3-server --path /mnt/ \\
+        ''' % archive_guest
+
+        self.runner = PodmanRun(image, "nfs", command)
+        self.runner.volumes.append((str(archive_path), archive_guest))
+        self.runner.ports.append((11111, 11111))
+    
+    @classmethod
+    def run_shell_bound(cls, archive_path: pathlib.Path):
+        server = cls(archive_path)
+        return server.runner.run_shell_bound()
+
+    @classmethod
+    def run_monitor(cls, archive_path: pathlib.Path):
+        server = cls(archive_path)
+        return cls.Monitor(server.runner.popen(stdout=subprocess.PIPE))
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -118,6 +181,7 @@ def parse_args():
     commands = parser.add_subparsers(dest="command", required=True)
     shell_command = commands.add_parser("shell", help="Get a shell with the yocto environment setup")
     nfs_command = commands.add_parser("nfs", help="Create an nfs share with from a rootfs tar file")
+    qemu_command = commands.add_parser("qemu", help="Run qemu with a normal image")
 
     _ = shell_command.add_argument("machine", help="Machine to setup the shell for", choices=yocto_machine.keys())
 
@@ -129,7 +193,10 @@ def shell_cmd(_args):
     yocto_shell("qemu", "/bin/bash")
 
 def nfs_cmd(args):
-    nfs_server(args.archive)
+    NFSServer.run_shell_bound(args.archive)
+
+def qemu_cmd(args):
+    run_qemu()
 
 if __name__ == "__main__":
     logging.basicConfig(stream = sys.stdout, level = logging.INFO)
@@ -137,6 +204,7 @@ if __name__ == "__main__":
     commands = {
         "shell": shell_cmd,
         "nfs": nfs_cmd,
+        "qemu": qemu_cmd,
     }
 
     args = parse_args()
