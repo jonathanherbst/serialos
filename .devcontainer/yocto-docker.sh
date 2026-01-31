@@ -1,7 +1,6 @@
 #! /bin/sh
 
 DOCKER="${DOCKER:=podman}"
-TARGET="${TARGET:=qemu}"
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 project_dir="${script_dir}/.."
@@ -9,18 +8,7 @@ docker_project_dir="/opt/serialos/"
 dockerfile="${script_dir}/Dockerfile"
 image_name="serialos/bbb-builder"
 
-MACHINE=""
-case "$TARGET" in
-    "qemu")
-        MACHINE=qemux86-64
-        ;;
-    "rpi-zero2w64")
-        MACHINE="raspberrypi0-2w-64-serialos"
-        ;;
-    "bb-black")
-        MACHINE="beagleboneblack-serialos"
-        ;;
-esac
+. $script_dir/env
 
 echo "Building for target: $TARGET, machine: $MACHINE"
 
@@ -39,8 +27,8 @@ ${DOCKER} run --rm -it \
     $DOCKER_EXTRA \
     -v "${project_dir}:${docker_project_dir}" \
     -w "${docker_project_dir}" \
-    -p "3049:3049/udp" \
-    -p "3048:3048/udp" \
+    -p "3049:3049" \
+    -p "3048:3048" \
     -e MACHINE="$MACHINE" \
     -e DISTRO="serialos" \
     -e ENABLE_UART=1 \

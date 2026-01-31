@@ -1,0 +1,14 @@
+TARGET="${TARGET:=qemu}"
+
+MACHINE=""
+case "$TARGET" in
+    "qemu")
+        MACHINE=qemux86-64
+        ;;
+    "rpi-zero2w64")
+        MACHINE="raspberrypi0-2w-64-serialos"
+        ;;
+    "bb-black")
+        MACHINE="beagle-serialos"
+        ;;
+esac
