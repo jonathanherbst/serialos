@@ -13,10 +13,10 @@ IMAGE_FEATURES:append = " \
 
 IMAGE_INSTALL = " \
     packagegroup-core-boot \
-    ${MEGASERIAL_EXTRA_INSTALL} \
+    ${SERIALOS_EXTRA_INSTALL} \
 "
 
-MEGASERIAL_EXTRA_INSTALL = " \
+SERIALOS_EXTRA_INSTALL = " \
     screen \
     btrfs-tools \
 "

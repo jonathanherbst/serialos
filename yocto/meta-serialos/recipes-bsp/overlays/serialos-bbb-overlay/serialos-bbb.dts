@@ -14,7 +14,7 @@
  */
 &{/chosen} {
 	overlays {
-		megaserial-overlays = __TIMESTAMP__;
+		serialos-overlays = __TIMESTAMP__;
 	};
 };
 

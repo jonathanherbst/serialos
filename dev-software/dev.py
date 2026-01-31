@@ -5,7 +5,6 @@ from podman.errors import exceptions
 import argparse
 import logging
 import pathlib
-import re
 import subprocess
 import sys
 
@@ -61,67 +60,79 @@ yocto_machine = {
 def yocto_shell(machine: str, command: str):
     image = get_yocto_image()
     project_dir = find_git_root(mod_path)
-    shell_cmd = '''podman run --rm -it \\
-            --entrypoint="/bin/bash" \\
-            --user="yocto" \\
-            --userns=keep-id \\
-            -v "{project_dir}:/opt/project" \\
-            -w /opt/project \\
-            -e MACHINE={mach} \\
-            -e DISTRO=megaserial \\
-            -e ENABLE_UART=1 \\
-            -e TERM=xterm-256color \\
-            -e BBLAYERS=" \\
-                /opt/project/yocto/poky/meta \\
-                /opt/project/yocto/poky/meta-poky \\
-                /opt/project/yocto/poky/meta-yocto-bsp \\
-                /opt/project/yocto/meta-ti/meta-beagle \\
-                /opt/project/yocto/meta-ti/meta-ti-bsp \\
-                /opt/project/yocto/meta-raspberrypi \\
-                /opt/project/yocto/meta-arm/meta-arm \\
-                /opt/project/yocto/meta-arm/meta-arm-toolchain \\
-                /opt/project/yocto/meta-megaserial \\
-            " \\
-            -e BB_ENV_PASSTHROUGH_ADDITIONS="BBLAYERS ENABLE_UART" \\
-            {image_id} \\
-            -c " \\
-                set -x && \\
-                cd /opt/project/yocto && \\
-                . poky/oe-init-build-env && \\
-                {command} \\
-            "'''.format(project_dir=project_dir, mach=yocto_machine[machine], image_id=image.id, command=command)
+    mount_dir = "/opt/project"
+    command = '''set -x && \\
+        cd {mount_dir}/yocto && \\
+        . poky/oe-init-build-env && \\
+        {command} \\
+    '''.format(mount_dir=mount_dir, command=command)
+    layers = [
+        "{mount_dir}/yocto/poky/meta",
+        "{mount_dir}/yocto/poky/meta-poky",
+        "{mount_dir}/yocto/poky/meta-yocto-bsp",
+        "{mount_dir}/yocto/meta-ti/meta-beagle",
+        "{mount_dir}/yocto/meta-ti/meta-ti-bsp",
+        "{mount_dir}/yocto/meta-raspberrypi",
+        "{mount_dir}/yocto/meta-arm/meta-arm",
+        "{mount_dir}/yocto/meta-arm/meta-arm-toolchain",
+        "{mount_dir}/yocto/meta-serialos",
+    ]
 
-    subprocess.run(shell_cmd, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr)
+    runner = PodmanRun(image, 'yocto', command)
+    runner.volumes = [(str(project_dir), mount_dir)]
+    runner.ports = [(3048, "3048/udp"), (3049, "3049/udp")]
+    runner.environment = [
+        ('MACHINE', yocto_machine[machine]),
+        ('DISTRO', "serialos"),
+        ('ENABLE_UART', "1"),
+        ('TERM', "xterm-256color"),
+        ('BBLAYERS', " ".join(layers).format(mount_dir=mount_dir)),
+        ('BB_ENV_PASSTHROUGH_ADDITIONS', "BBLAYERS ENABLE_UART"),
+    ]
+    runner.run_shell_bound()
 
 def run_qemu():
     yocto_shell("qemu", "bitbake serialos-bare-image")
-    yocto_shell("qemu", " \
-        qemu-img create -f qcow2 /home/yocto/data-img.qcow2 1G && \
-        runqemu serialos-bare-image slirp nographic qemuparams=\"-drive file=/home/yocto/data-img.qcow2,format=qcow2,if=virtio\" \
-    ")
+    yocto_shell("qemu", ''' \\
+        qemu-img create -f qcow2 /home/yocto/data-img.qcow2 1G && \\
+        runqemu serialos-bare-image nfs slirp nographic qemuparams=\\"-drive file=/home/yocto/data-img.qcow2,format=qcow2,if=virtio\\" \\
+    ''')
+
+def run_nfs_from_target(machine, target):
+    # find the tar for the image
+    # extract the image
+    # run the nfs server
+    pass
 
 class PodmanRun:
     def __init__(self, image: PodmanImage, user: str, command: str):
         self.image = image
         self.user = user
         self.command = command
+        self.work_dir: str | None = None
         self.volumes: list[tuple[str, str]] = []
-        self.ports: list[tuple[int, int]] = []
+        self.ports: list[tuple[int, str]] = []
         self.environment: list[tuple[str, str]] = []
 
     def build_command(self):
+        extra_args = []
+        if self.work_dir is not None:
+            extra_args.append("-w %s" % self.work_dir)
+        extra_args = " ".join(extra_args)
+
         vol_args = " ".join(['-v "%s:%s"' % (host, guest) for (host, guest) in self.volumes])
-        port_args = " ".join(['-p "%d:%d"' % (host, guest) for (host, guest) in self.ports])
+        port_args = " ".join(['-p "%d:%s"' % (host, guest) for (host, guest) in self.ports])
         env_args = " ".join(['-e "%s=%s"' % (name, value) for (name, value) in self.environment])
         return '''podman run --rm -it \\
             --entrypoint="/bin/bash" \\
             --user="{user}" \\
             --userns=keep-id \\
+            {extra} \\
             {volumes} \\
             {ports} \\
             {environment} \\
             {image_id} -c "{command}" \\
-        '''.format(user=self.user, volumes=vol_args, ports=port_args, environment=env_args, image_id=self.image.id, command=self.command)
+        '''.format(user=self.user, extra=extra_args, volumes=vol_args, ports=port_args, environment=env_args, image_id=self.image.id, command=self.command)
 
     def run_shell_bound(self):
         shell_cmd = self.build_command()

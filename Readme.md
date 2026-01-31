@@ -1,4 +1,4 @@
-# Megaserial OS
+# Serial OS
 
 I guess this is an OS which brings things you need for making your own embedded linux application on some different hardware.
 

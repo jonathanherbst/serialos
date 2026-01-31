@@ -5,9 +5,9 @@ TARGET="${TARGET:=qemu}"
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 project_dir="${script_dir}/.."
-docker_project_dir="/opt/megaserial/"
+docker_project_dir="/opt/serialos/"
 dockerfile="${script_dir}/Dockerfile"
-image_name="megaserial/bbb-builder"
+image_name="serialos/bbb-builder"
 
 MACHINE=""
 case "$TARGET" in
@@ -18,7 +18,7 @@ case "$TARGET" in
         MACHINE="raspberrypi0-2w-64-serialos"
         ;;
     "bb-black")
-        MACHINE="beagleboneblack-megaserial"
+        MACHINE="beagleboneblack-serialos"
         ;;
 esac
 
@@ -35,12 +35,14 @@ DOCKER_EXTRA="--userns=keep-id"
 
 ${DOCKER} run --rm -it \
     --entrypoint="/bin/bash" \
-    --user="megaserial" \
+    --user="serialos" \
     $DOCKER_EXTRA \
     -v "${project_dir}:${docker_project_dir}" \
     -w "${docker_project_dir}" \
+    -p "3049:3049/udp" \
+    -p "3048:3048/udp" \
     -e MACHINE="$MACHINE" \
-    -e DISTRO="megaserial" \
+    -e DISTRO="serialos" \
     -e ENABLE_UART=1 \
     -e TERM="xterm-256color" \
     -e BBLAYERS=" \
@@ -52,7 +54,7 @@ ${DOCKER} run --rm -it \
         ${docker_project_dir}/yocto/meta-raspberrypi \
         ${docker_project_dir}/yocto/meta-arm/meta-arm \
         ${docker_project_dir}/yocto/meta-arm/meta-arm-toolchain \
-        ${docker_project_dir}/yocto/meta-megaserial \
+        ${docker_project_dir}/yocto/meta-serialos \
     " \
     -e BB_ENV_PASSTHROUGH_ADDITIONS="BBLAYERS ENABLE_UART" \
     "${image_name}" -c " \

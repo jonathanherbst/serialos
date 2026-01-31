@@ -18,6 +18,7 @@ RUN apt-get install -y \
     libacl1 \
     liblz4-tool \
     locales \
+    procps \
     python3 \
     python3-git \
     python3-jinja2 \
@@ -40,7 +41,7 @@ RUN locale-gen
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
-RUN groupadd -g ${USER_ID} megaserial && \
-    useradd -N -m -u ${USER_ID} -g ${GROUP_ID} -s "/bin/bash" megaserial && \
-    adduser megaserial sudo
+RUN groupadd -g ${USER_ID} serialos && \
+    useradd -N -m -u ${USER_ID} -g ${GROUP_ID} -s "/bin/bash" serialos && \
+    adduser serialos sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
