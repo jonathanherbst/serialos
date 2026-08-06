@@ -3,7 +3,7 @@ yocto/build
 
 # vscode
 .vscode
+.devcontainer/personal
 
 # vim
 Session.vim
-
