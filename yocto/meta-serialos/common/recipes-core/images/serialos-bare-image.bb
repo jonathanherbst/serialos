@@ -10,11 +10,14 @@ IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "syst
 
 IMAGE_FEATURES:append = " \
     ssh-server-dropbear \
+    read-only-rootfs \
 "
 
 IMAGE_INSTALL = " \
     packagegroup-core-boot \
     kernel-modules \
+    util-linux \
+    serialos-config \
     ${IMAGE_EXTRA_INSTALL} \
 "
 

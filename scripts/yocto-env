@@ -1,0 +1,63 @@
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+PROJECT_DIR="$(realpath $SCRIPT_DIR/..)"
+
+TARGET="${TARGET:-qemu}"
+BUILD_DIR="${BUILD_DIR:-${PROJECT_DIR}/yocto/build}"
+IMAGE="${IMAGE:-serialos-bare-image}"
+ROOTFS="$PROJECT_DIR/rootfs/$TARGET/$IMAGE/rootfs"
+
+case $TARGET in
+    qemu)
+        MACHINE=qemux86-64
+        BBLAYERS="\
+            ${PROJECT_DIR}/yocto/poky/meta \
+            ${PROJECT_DIR}/yocto/poky/meta-poky \
+            ${PROJECT_DIR}/yocto/poky/meta-yocto-bsp \
+            ${PROJECT_DIR}/yocto/meta-serialos/common \
+        "
+        ;;
+
+    beaglebone-black)
+        MACHINE=beagle-serialos
+        BBLAYERS="\
+            ${PROJECT_DIR}/yocto/poky/meta \
+            ${PROJECT_DIR}/yocto/poky/meta-poky \
+            ${PROJECT_DIR}/yocto/poky/meta-yocto-bsp \
+            ${PROJECT_DIR}/yocto/meta-ti/meta-beagle \
+            ${PROJECT_DIR}/yocto/meta-ti/meta-ti-bsp \
+            ${PROJECT_DIR}/yocto/meta-arm/meta-arm \
+            ${PROJECT_DIR}/yocto/meta-arm/meta-arm-toolchain \
+            ${PROJECT_DIR}/yocto/meta-serialos/common \
+            ${PROJECT_DIR}/yocto/meta-serialos/bsp-beagle \
+        "
+        ;;
+
+    raspberrypi-zero2w64)
+        MACHINE=raspberrypi0-2w-64-serialos
+        BBLAYERS="\
+            ${PROJECT_DIR}/yocto/poky/meta \
+            ${PROJECT_DIR}/yocto/poky/meta-poky \
+            ${PROJECT_DIR}/yocto/poky/meta-yocto-bsp \
+            ${PROJECT_DIR}/yocto/meta-raspberrypi \
+            ${PROJECT_DIR}/yocto/meta-serialos/common \
+            ${PROJECT_DIR}/yocto/meta-serialos/bsp-raspberrypi \
+        "
+        ;;
+
+    *)
+        echo "Error: unknown target $TARGET"
+        exit 1
+    ;;
+esac
+
+export TARGET
+export MACHINE
+export BBLAYERS
+export DISTRO="serialos"
+export BB_ENV_PASSTHROUGH_ADDITIONS="BBLAYERS"
+export IMAGE
+export ROOTFS
+export SCRIPT_DIR
+export PROJECT_DIR
+
+source ${PROJECT_DIR}/yocto/poky/oe-init-build-env ${BUILD_DIR}

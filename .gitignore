@@ -1,5 +1,6 @@
 # yocto
 yocto/build
+rootfs
 
 # vscode
 .vscode

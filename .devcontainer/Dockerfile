@@ -22,6 +22,7 @@ RUN apt-get install -y \
     python3-pexpect \
     python3-pip \
     python3-subunit \
+    qemu-utils \
     socat \
     texinfo \
     unzip \
