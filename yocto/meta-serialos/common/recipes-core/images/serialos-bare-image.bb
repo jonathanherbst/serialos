@@ -18,6 +18,7 @@ IMAGE_INSTALL = " \
     kernel-modules \
     util-linux \
     serialos-config \
+    serialos-software \
     ${IMAGE_EXTRA_INSTALL} \
 "
 

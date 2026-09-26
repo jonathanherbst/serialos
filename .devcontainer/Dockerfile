@@ -33,3 +33,6 @@ RUN apt-get install -y \
 # setup the locale as required by yocto
 RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 RUN locale-gen
+
+USER vscode
+RUN curl --proto '=https' --tlsv1.2 -LsSf https://sh.rustup.rs | bash -s -- -y --default-toolchain 1.75.0 --profile minimal

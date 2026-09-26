@@ -2,6 +2,9 @@
 yocto/build
 rootfs
 
+# rust
+target
+
 # vscode
 .vscode
 .devcontainer/personal
