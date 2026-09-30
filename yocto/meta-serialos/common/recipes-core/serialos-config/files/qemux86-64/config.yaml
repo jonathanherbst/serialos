@@ -1,1 +1,2 @@
-data-volume: /dev/vda
+volume:
+  device: /sys/devices/pci0000:00/0000:00:04.0/
