@@ -1,6 +1,3 @@
-[submodule "yocto/poky"]
-	path = yocto/poky
-	url = https://git.yoctoproject.org/poky
 [submodule "yocto/meta-ti"]
 	path = yocto/meta-ti
 	url = https://git.yoctoproject.org/meta-ti
@@ -10,3 +7,12 @@
 [submodule "yocto/meta-arm"]
 	path = yocto/meta-arm
 	url = https://git.yoctoproject.org/meta-arm
+[submodule "yocto/bitbake"]
+	path = yocto/bitbake
+	url = https://github.com/openembedded/bitbake.git
+[submodule "yocto/openembedded-core"]
+	path = yocto/openembedded-core
+	url = https://github.com/openembedded/openembedded-core.git
+[submodule "yocto/meta-yocto"]
+	path = yocto/meta-yocto
+	url = https://github.com/yoctoproject/meta-yocto.git

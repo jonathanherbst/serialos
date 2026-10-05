@@ -10,9 +10,9 @@ case $TARGET in
     qemu)
         MACHINE=qemux86-64
         BBLAYERS="\
-            ${PROJECT_DIR}/yocto/poky/meta \
-            ${PROJECT_DIR}/yocto/poky/meta-poky \
-            ${PROJECT_DIR}/yocto/poky/meta-yocto-bsp \
+            ${PROJECT_DIR}/yocto/openembedded-core/meta \
+            ${PROJECT_DIR}/yocto/meta-yocto/meta-poky \
+            ${PROJECT_DIR}/yocto/meta-yocto/meta-yocto-bsp \
             ${PROJECT_DIR}/yocto/meta-serialos/common \
         "
         ;;
@@ -20,9 +20,9 @@ case $TARGET in
     beaglebone-black)
         MACHINE=beagle-serialos
         BBLAYERS="\
-            ${PROJECT_DIR}/yocto/poky/meta \
-            ${PROJECT_DIR}/yocto/poky/meta-poky \
-            ${PROJECT_DIR}/yocto/poky/meta-yocto-bsp \
+            ${PROJECT_DIR}/yocto/openembedded-core/meta \
+            ${PROJECT_DIR}/yocto/meta-yocto/meta-poky \
+            ${PROJECT_DIR}/yocto/meta-yocto/meta-yocto-bsp \
             ${PROJECT_DIR}/yocto/meta-ti/meta-beagle \
             ${PROJECT_DIR}/yocto/meta-ti/meta-ti-bsp \
             ${PROJECT_DIR}/yocto/meta-arm/meta-arm \
@@ -35,9 +35,9 @@ case $TARGET in
     raspberrypi-zero2w64)
         MACHINE=raspberrypi0-2w-64-serialos
         BBLAYERS="\
-            ${PROJECT_DIR}/yocto/poky/meta \
-            ${PROJECT_DIR}/yocto/poky/meta-poky \
-            ${PROJECT_DIR}/yocto/poky/meta-yocto-bsp \
+            ${PROJECT_DIR}/yocto/openembedded-core/meta \
+            ${PROJECT_DIR}/yocto/meta-yocto/meta-poky \
+            ${PROJECT_DIR}/yocto/meta-yocto/meta-yocto-bsp \
             ${PROJECT_DIR}/yocto/meta-raspberrypi \
             ${PROJECT_DIR}/yocto/meta-serialos/common \
             ${PROJECT_DIR}/yocto/meta-serialos/bsp-raspberrypi \
