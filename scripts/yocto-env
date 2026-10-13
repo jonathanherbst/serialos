@@ -60,4 +60,4 @@ export ROOTFS
 export SCRIPT_DIR
 export PROJECT_DIR
 
-source ${PROJECT_DIR}/yocto/poky/oe-init-build-env ${BUILD_DIR}
+source ${PROJECT_DIR}/yocto/openembedded-core/oe-init-build-env ${BUILD_DIR}

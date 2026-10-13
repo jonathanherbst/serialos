@@ -2,7 +2,7 @@ DESCRIPTION = "Serial OS Configuration"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=990cdac95cb92035c2df58cadf9a387e"
 
-S = "${WORKDIR}"
+S = "${UNPACKDIR}"
 
 SRC_URI = "\
     file://config.yaml \
