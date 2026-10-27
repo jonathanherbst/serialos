@@ -24,6 +24,7 @@ RUN apt-get install -y \
     python3-subunit \
     qemu-utils \
     socat \
+    tmux \
     texinfo \
     unzip \
     wget \

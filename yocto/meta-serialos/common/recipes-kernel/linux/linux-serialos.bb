@@ -15,7 +15,7 @@ PV = "6.6.32+git"
 
 LINUX_STABLE_GIT_URI ?= "git://github.com/beagleboard/linux.git;protocol=https"
 SRC_URI = "${LINUX_STABLE_GIT_URI};branch=${LINUX_STABLE_BRANCH}"
-S = "${WORKDIR}/git"
+S = "${UNPACKDIR}/${BB_GIT_DEFAULT_DESTSUFFIX}"
 
 SRC_URI:append = " \
     file://defconfig \

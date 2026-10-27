@@ -1,0 +1,48 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Copyright (C) 2012 Texas Instruments Incorporated - https://www.ti.com/
+ */
+/dts-v1/;
+
+#include "am33xx.dtsi"
+#include "am335x-bone-common.dtsi"
+#include "am335x-boneblack-common.dtsi"
+
+/ {
+	model = "TI AM335x BeagleBone Black";
+	compatible = "ti,am335x-bone-black", "ti,am335x-bone", "ti,am33xx";
+};
+
+&cpu0_opp_table {
+	/*
+	 * All PG 2.0 silicon may not support 1GHz but some of the early
+	 * BeagleBone Blacks have PG 2.0 silicon which is guaranteed
+	 * to support 1GHz OPP so enable it for PG 2.0 on this board.
+	 */
+	opp-1000000000 {
+		/* OPP Nitro */
+		opp-supported-hw = <0x06 0x0100>;
+	};
+};
+
+&baseboard_eeprom {
+	vcc-supply = <&ldo4_reg>;
+};
+
+&am33xx_pinmux {
+	bb_uart1_pins: pinmux_bb_uart1_pins {
+		pinctrl-single,pins = <
+			AM33XX_PADCONF(AM335X_PIN_UART1_TXD, PIN_OUTPUT, MUX_MODE0)	/* P9_24 uart1_txd.uart1_txd */
+			AM33XX_PADCONF(AM335X_PIN_UART1_RXD, PIN_INPUT, MUX_MODE0)	/* P9_26 uart1_rxd.uart1_rxd */
+			//AM33XX_PADCONF(AM335X_PIN_UART1_RTSN, PIN_OUTPUT, MUX_MODE0)	/* P9_19 uart1_rtsn.uart1_rtsn */
+			//AM33XX_PADCONF(AM335X_PIN_UART1_CTSN, PIN_INPUT, MUX_MODE0)	/* P9_20 uart1_ctsn.uart1_ctsn */
+		>;
+	};
+};
+
+&uart1 {
+	/* sudo agetty 115200 ttyS1 */
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&bb_uart1_pins>;
+};

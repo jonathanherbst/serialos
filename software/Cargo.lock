@@ -95,22 +95,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "libbtrfs"
-version = "0.0.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14b7136b6f0221970d31c88d802fd74faa8f2500a4f22b809e39cd99744f5592"
-dependencies = [
- "libc",
- "uuid",
-]
-
-[[package]]
-name = "libc"
-version = "0.2.189"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2"
-
-[[package]]
 name = "once_cell"
 version = "1.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -194,7 +178,6 @@ version = "0.1.0"
 dependencies = [
  "hashbrown",
  "indexmap",
- "libbtrfs",
  "serde",
  "uuid",
  "yaml_serde",

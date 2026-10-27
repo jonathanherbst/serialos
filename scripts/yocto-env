@@ -60,4 +60,5 @@ export ROOTFS
 export SCRIPT_DIR
 export PROJECT_DIR
 
+# have to specify build dir here or oe-init-build-env uses the arguments to whatever script calls this as the build dir
 source ${PROJECT_DIR}/yocto/openembedded-core/oe-init-build-env ${BUILD_DIR}

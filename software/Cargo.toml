@@ -5,7 +5,6 @@ edition = "2021"
 rust-version = "1.75"
 
 [dependencies]
-libbtrfs = "0.0.12"
 serde = { version = "1.0.229", features = ["serde_derive"] }
 yaml_serde = "=0.10.2"
 

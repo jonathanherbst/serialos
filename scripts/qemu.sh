@@ -5,7 +5,7 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)/yocto-env"
 set -x
 
 if [ ! -d "$ROOTFS" ]; then
-    $SCRIPT_DIR/populate-rootfs.sh
+    $SCRIPT_DIR/populate-rootfs.sh $@
 fi
 
 data_img="$(realpath $ROOTFS/../data-img.qcow2)"
